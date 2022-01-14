@@ -5,31 +5,31 @@ import jsonpickle
 import ebbs
 
 class email(ebbs.Builder):
-    def __init__(self, name="Send an email"):
+    def __init__(this, name="Send an email"):
         super().__init__(name)
     
-        self.supportedProjectTypes = []
+        this.supportedProjectTypes = []
 
-        self.requiredKWArgs.append("--email-config")
-        self.requiredKWArgs.append("--message")
+        this.requiredKWArgs.append("--email-config")
+        this.requiredKWArgs.append("--message")
 
-    def PreBuild(self, **kwargs):
-        self.email = jsonpickle.decode(open(kwargs.get('--email-config'), 'r').read()) | jsonpickle.decode(open(kwargs.get('--message'), 'r').read())
+    def PreBuild(this, **kwargs):
+        this.email = jsonpickle.decode(open(kwargs.get('--email-config'), 'r').read()) | jsonpickle.decode(open(kwargs.get('--message'), 'r').read())
 
     #Required Builder method. See that class for details.
-    def Build(self):
-        email_text = f'''From: {self.email['mail_from']}
-To: {self.email['mail_to']}
-Subject: {self.email['subject']}
+    def Build(this):
+        email_text = f'''From: {this.email['mail_from']}
+To: {this.email['mail_to']}
+Subject: {this.email['subject']}
 
-{self.email['message']}
+{this.email['message']}
 '''
         logging.debug(f'Trying to send: \n{email_text}')
         context = ssl.create_default_context()
-        server = smtplib.SMTP(self.email['smtp_server'], self.email['smtp_port'])
+        server = smtplib.SMTP(this.email['smtp_server'], this.email['smtp_port'])
         server.ehlo()
         server.starttls(context=context)
-        server.login(self.email['username'], self.email['password'])
-        server.sendmail(self.email['mail_from'], self.email['mail_to'], email_text)
+        server.login(this.email['username'], this.email['password'])
+        server.sendmail(this.email['mail_from'], this.email['mail_to'], email_text)
         server.close()
         logging.info('Email sent!')
